@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Documents</title>
+<title>Ascent - Upload Document</title>
 <style>
     * {
         margin: 0;
@@ -31,9 +31,15 @@
     }
 
     .upload-container h2 {
-        margin-bottom: 25px;
+        margin-bottom: 5px;
         color: #1e3c72;
         font-weight: 600;
+    }
+
+    .upload-container .subtitle {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 25px;
     }
 
     .input-group {
@@ -46,6 +52,7 @@
         color: #2a5298;
         margin-bottom: 5px;
         display: block;
+        font-weight: 600;
     }
 
     .input-group input,
@@ -57,6 +64,8 @@
         border-radius: 8px;
         outline: none;
         transition: 0.3s;
+        font-family: inherit;
+        font-size: 14px;
     }
 
     .input-group input:focus,
@@ -66,21 +75,32 @@
         box-shadow: 0 0 8px rgba(42, 82, 152, 0.2);
     }
 
-    .file-input {
+    .file-drop {
         border: 2px dashed #2a5298;
-        padding: 20px;
+        padding: 25px 20px;
         text-align: center;
         border-radius: 10px;
         cursor: pointer;
         transition: 0.3s;
+        background: #f7f9fc;
     }
 
-    .file-input:hover {
-        background-color: #f0f6ff;
+    .file-drop:hover, .file-drop.dragover {
+        background: #eef2fb;
+        border-color: #1e3c72;
     }
 
-    .file-input input {
-        border: none;
+    .file-drop p { font-size: 14px; color: #555; margin-bottom: 8px; }
+    .file-drop span { font-size: 12px; color: #888; }
+
+    .file-drop input[type="file"] { display: none; }
+
+    .file-chosen {
+        font-size: 13px;
+        color: #27ae60;
+        margin-top: 8px;
+        font-weight: 600;
+        display: none;
     }
 
     .upload-btn {
@@ -94,16 +114,36 @@
         font-weight: 600;
         cursor: pointer;
         transition: 0.3s;
-        margin-top: 10px;
+        margin-top: 5px;
     }
 
-    .upload-btn:hover {
-        background-color: #1e3c72;
+    .upload-btn:hover { background-color: #1e3c72; }
+
+    .success-msg {
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        margin-bottom: 15px;
+        display: none;
+    }
+
+    .error-msg {
+        background: #fee2e2;
+        color: #c0392b;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        margin-bottom: 15px;
+        display: none;
     }
 
     .extra-links {
         margin-top: 20px;
         font-size: 14px;
+        display: flex;
+        justify-content: space-between;
     }
 
     .extra-links a {
@@ -111,20 +151,21 @@
         text-decoration: none;
     }
 
-    .extra-links a:hover {
-        text-decoration: underline;
-    }
+    .extra-links a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <div class="upload-container">
     <h2>Upload Document</h2>
+    <p class="subtitle">Add files to your Ascent portfolio</p>
 
-    <form enctype="multipart/form-data">
-        
+    <div class="success-msg" id="successMsg">Document uploaded successfully!</div>
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form onsubmit="handleUpload(event)">
         <div class="input-group">
-            <label for="title">Document Title</label>
+            <label for="title">Document Title *</label>
             <input type="text" id="title" placeholder="Enter document title" required>
         </div>
 
@@ -135,15 +176,19 @@
                 <option>Assignment</option>
                 <option>Report</option>
                 <option>Resume</option>
+                <option>Certificate</option>
                 <option>Other</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label>Choose File</label>
-            <div class="file-input">
-                <input type="file" required>
+            <label>Choose File *</label>
+            <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+                <p>Click to browse or drag and drop</p>
+                <span>PDF, DOC, DOCX, PNG, JPG (max 5MB)</span>
+                <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt">
             </div>
+            <div class="file-chosen" id="fileChosen"></div>
         </div>
 
         <div class="input-group">
@@ -154,11 +199,104 @@
         <button type="submit" class="upload-btn">Upload</button>
 
         <div class="extra-links">
-            <p><a href="login.html">Logout</a></p>
+            <a href="documents.html">← Back to Dashboard</a>
+            <a href="login.html" onclick="logout()">Logout</a>
         </div>
-
     </form>
 </div>
+
+<script>
+    // Auth check
+    if (localStorage.getItem('ascent_logged_in') !== 'true') {
+        window.location.href = 'login.html';
+    }
+
+    const fileInput  = document.getElementById('fileInput');
+    const fileChosen = document.getElementById('fileChosen');
+    const fileDrop   = document.getElementById('fileDrop');
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files[0]) {
+            fileChosen.textContent = '✓ ' + fileInput.files[0].name;
+            fileChosen.style.display = 'block';
+        }
+    });
+
+    // Drag and drop
+    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+    fileDrop.addEventListener('drop', e => {
+        e.preventDefault();
+        fileDrop.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            fileInput.files = e.dataTransfer.files;
+            fileChosen.textContent = '✓ ' + file.name;
+            fileChosen.style.display = 'block';
+        }
+    });
+
+    function handleUpload(e) {
+        e.preventDefault();
+
+        const title       = document.getElementById('title').value.trim();
+        const category    = document.getElementById('category').value;
+        const description = document.getElementById('description').value.trim();
+        const file        = fileInput.files[0];
+        const errorMsg    = document.getElementById('errorMsg');
+        const successMsg  = document.getElementById('successMsg');
+
+        errorMsg.style.display  = 'none';
+        successMsg.style.display = 'none';
+
+        if (!file) {
+            errorMsg.textContent = 'Please choose a file to upload.';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            errorMsg.textContent = 'File is too large. Maximum size is 5MB.';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const docs = JSON.parse(localStorage.getItem('ascent_documents') || '[]');
+            docs.push({
+                id:          Date.now(),
+                title,
+                category,
+                description,
+                fileName:    file.name,
+                fileType:    file.type,
+                fileSize:    file.size,
+                fileData:    ev.target.result, // base64
+                uploadedAt:  new Date().toISOString()
+            });
+            localStorage.setItem('ascent_documents', JSON.stringify(docs));
+
+            successMsg.style.display = 'block';
+
+            // Reset form
+            document.getElementById('title').value       = '';
+            document.getElementById('category').value    = '';
+            document.getElementById('description').value = '';
+            fileInput.value = '';
+            fileChosen.style.display = 'none';
+
+            setTimeout(() => { window.location.href = 'documents.html'; }, 1200);
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function logout() {
+        localStorage.removeItem('ascent_logged_in');
+        localStorage.removeItem('ascent_current_user');
+    }
+</script>
 
 </body>
 </html>
