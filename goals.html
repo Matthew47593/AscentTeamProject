@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascent - Career Goals</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 5px;
+        color: #1e3c72;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.2s;
+        display: inline-block;
+    }
+
+    .btn-primary { background-color: #2a5298; color: white; }
+    .btn-primary:hover { background-color: #1e3c72; }
+    .btn-secondary { background-color: #e0e0e0; color: #333; }
+    .btn-secondary:hover { background-color: #cfcfcf; }
+
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .goal-card {
+        background: #f7f9fc;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 5px solid #2a5298;
+        transition: 0.2s;
+    }
+
+    .goal-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .goal-card.completed { border-left-color: #27ae60; }
+    .goal-card.paused    { border-left-color: #e67e22; }
+
+    .goal-title { font-weight: 600; color: #1e3c72; margin-bottom: 5px; font-size: 15px; }
+    .goal-category { font-size: 12px; color: #2a5298; margin-bottom: 6px; }
+    .goal-description { font-size: 13px; color: #555; margin-bottom: 8px; }
+    .goal-meta { font-size: 12px; color: #888; margin-bottom: 12px; }
+
+    .progress-bar-wrap {
+        background: #e0e7f0;
+        border-radius: 6px;
+        height: 7px;
+        margin-bottom: 5px;
+        overflow: hidden;
+    }
+    .progress-bar-fill { height: 100%; background: #2a5298; border-radius: 6px; }
+    .goal-card.completed .progress-bar-fill { background: #27ae60; }
+    .progress-label { font-size: 12px; color: #888; margin-bottom: 12px; }
+
+    .steps-list { list-style: none; margin-bottom: 14px; }
+
+    .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 13px;
+        color: #444;
+        border-bottom: 1px solid #e8edf5;
+        cursor: pointer;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-item.done { color: #999; text-decoration: line-through; }
+
+    .step-checkbox {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #2a5298;
+        border-radius: 3px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        margin-top: 1px;
+    }
+    .step-checkbox.checked { background: #2a5298; }
+    .step-checkbox.checked::after { content: '✓'; color: white; font-size: 10px; font-weight: 700; }
+
+    .goal-actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+        padding: 6px 11px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .empty-state { text-align: center; color: #aaa; margin-top: 40px; font-size: 14px; }
+
+    /* Modals */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal h3 { color: #1e3c72; margin-bottom: 20px; font-size: 17px; }
+
+    .input-group { margin-bottom: 16px; }
+    .input-group label { font-size: 13px; color: #2a5298; display: block; margin-bottom: 5px; font-weight: 600; }
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+        border-color: #2a5298;
+        box-shadow: 0 0 6px rgba(42, 82, 152, 0.2);
+    }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    .existing-steps { margin-bottom: 14px; }
+    .existing-steps h4 { font-size: 13px; color: #555; margin-bottom: 8px; }
+
+    .step-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eef2f9;
+        border-radius: 6px;
+        padding: 4px 9px;
+        font-size: 12px;
+        margin: 3px 3px 3px 0;
+        color: #333;
+    }
+    .step-tag button { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 14px; line-height: 1; padding: 0; }
+
+    .smart-hint {
+        background: #f0f4fb;
+        border-radius: 8px;
+        padding: 10px 13px;
+        font-size: 12px;
+        color: #555;
+        margin-bottom: 16px;
+        line-height: 1.6;
+    }
+    .smart-hint strong { color: #2a5298; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Career Goals</h2>
+    <p class="subtitle">Set goals, add steps, and track your progress.</p>
+
+    <div class="top-bar">
+        <a href="documents.html" class="btn btn-secondary">← Back to Dashboard</a>
+        <button class="btn btn-primary" onclick="openGoalModal()">+ Add Goal</button>
+    </div>
+
+    <div class="goals-grid" id="goalsGrid">
+        <p class="empty-state">No goals added yet.</p>
+    </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="modal-overlay" id="goalModal">
+    <div class="modal">
+        <h3 id="goalModalTitle">Add New Goal</h3>
+        <div class="input-group">
+            <label>Goal Title *</label>
+            <input type="text" id="goalTitle" placeholder="e.g. Become a Software Developer">
+        </div>
+        <div class="input-group">
+            <label>Category</label>
+            <select id="goalCategory">
+                <option value="">Select Category</option>
+                <option>Career Development</option>
+                <option>Education</option>
+                <option>Skills</option>
+                <option>Networking</option>
+                <option>Personal Branding</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Description</label>
+            <textarea id="goalDescription" rows="3" placeholder="What does achieving this goal look like?"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Target Deadline</label>
+            <input type="date" id="goalDeadline">
+        </div>
+        <div class="input-group">
+            <label>Status</label>
+            <select id="goalStatus">
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="paused">Paused</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveGoal()">Save Goal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Steps Modal -->
+<div class="modal-overlay" id="stepModal">
+    <div class="modal">
+        <h3>Manage Steps</h3>
+        <div class="smart-hint">
+            <strong>Tip:</strong> Try writing <strong>SMART</strong> steps — Specific, Measurable, Achievable, Relevant, Time-bound.<br>
+            e.g. <em>"Complete an online JavaScript course by May 30."</em>
+        </div>
+        <div class="existing-steps" id="existingSteps"></div>
+        <div class="input-group">
+            <label>New Step</label>
+            <input type="text" id="stepText" placeholder="e.g. Apply to 3 internships by March">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeStepModal()">Done</button>
+            <button class="btn btn-primary" onclick="addStep()">+ Add Step</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadGoals() { return JSON.parse(localStorage.getItem('ascent_goals') || '[]'); }
+    function saveGoals(g) { localStorage.setItem('ascent_goals', JSON.stringify(g)); }
+
+    let goals = loadGoals();
+    let editingId = null;
+    let stepGoalId = null;
+
+    if (goals.length === 0) {
+        goals = [{
+            id: Date.now(),
+            title: "Become a Full-Stack Developer",
+            category: "Career Development",
+            description: "Learn front-end and back-end development to land a junior dev role.",
+            deadline: "2026-12-31",
+            status: "in-progress",
+            steps: [
+                { id: 1, text: "Complete a React course by April 30", done: true },
+                { id: 2, text: "Build 2 portfolio projects by August", done: false },
+                { id: 3, text: "Apply to 5 graduate roles by November", done: false }
+            ]
+        }];
+        saveGoals(goals);
+    }
+
+    function render() {
+        const grid = document.getElementById('goalsGrid');
+        if (goals.length === 0) {
+            grid.innerHTML = '<p class="empty-state">No goals added yet.</p>';
+            return;
+        }
+        grid.innerHTML = goals.map(g => {
+            const total = g.steps.length;
+            const done  = g.steps.filter(s => s.done).length;
+            const pct   = total ? Math.round((done / total) * 100) : 0;
+            const statusLabel = { 'in-progress': 'In Progress', 'completed': 'Completed', 'paused': 'Paused' }[g.status] || g.status;
+
+            const stepsHtml = g.steps.length
+                ? `<ul class="steps-list">${g.steps.map(s => `
+                    <li class="step-item ${s.done ? 'done' : ''}" onclick="toggleStep(${g.id}, ${s.id})">
+                        <div class="step-checkbox ${s.done ? 'checked' : ''}"></div>
+                        <span>${s.text}</span>
+                    </li>`).join('')}</ul>`
+                : `<p style="font-size:13px;color:#bbb;margin-bottom:12px;">No steps added yet.</p>`;
+
+            return `
+                <div class="goal-card ${g.status === 'completed' ? 'completed' : g.status === 'paused' ? 'paused' : ''}">
+                    <div class="goal-title">${g.title}</div>
+                    ${g.category ? `<div class="goal-category">${g.category}</div>` : ''}
+                    ${g.description ? `<div class="goal-description">${g.description}</div>` : ''}
+                    <div class="goal-meta">${g.deadline ? `Deadline: ${formatDate(g.deadline)} &nbsp;·&nbsp; ` : ''}Status: ${statusLabel}</div>
+                    ${total > 0 ? `
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:${pct}%"></div>
+                        </div>
+                        <div class="progress-label">${done}/${total} steps complete</div>` : ''}
+                    ${stepsHtml}
+                    <div class="goal-actions">
+                        <button class="btn-sm" style="background:#2a5298;color:white" onclick="openStepModal(${g.id})">Steps</button>
+                        <button class="btn-sm" style="background:#e0e0e0;color:#333" onclick="openEditGoal(${g.id})">Edit</button>
+                        <button class="btn-sm" style="background:#fee2e2;color:#c0392b" onclick="deleteGoal(${g.id})">Delete</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function formatDate(str) {
+        const [y, m, d] = str.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    function openGoalModal() {
+        editingId = null;
+        document.getElementById('goalModalTitle').textContent = 'Add New Goal';
+        ['goalTitle','goalDescription','goalDeadline'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('goalCategory').value = '';
+        document.getElementById('goalStatus').value = 'in-progress';
+        document.getElementById('goalModal').classList.add('active');
+    }
+
+    function openEditGoal(id) {
+        const g = goals.find(x => x.id === id);
+        if (!g) return;
+        editingId = id;
+        document.getElementById('goalModalTitle').textContent = 'Edit Goal';
+        document.getElementById('goalTitle').value = g.title;
+        document.getElementById('goalCategory').value = g.category || '';
+        document.getElementById('goalDescription').value = g.description || '';
+        document.getElementById('goalDeadline').value = g.deadline || '';
+        document.getElementById('goalStatus').value = g.status;
+        document.getElementById('goalModal').classList.add('active');
+    }
+
+    function closeGoalModal() { document.getElementById('goalModal').classList.remove('active'); }
+
+    function saveGoal() {
+        const title = document.getElementById('goalTitle').value.trim();
+        if (!title) { alert('Please enter a goal title.'); return; }
+        if (editingId) {
+            const g = goals.find(x => x.id === editingId);
+            g.title       = title;
+            g.category    = document.getElementById('goalCategory').value;
+            g.description = document.getElementById('goalDescription').value.trim();
+            g.deadline    = document.getElementById('goalDeadline').value;
+            g.status      = document.getElementById('goalStatus').value;
+        } else {
+            goals.push({
+                id: Date.now(), title,
+                category:    document.getElementById('goalCategory').value,
+                description: document.getElementById('goalDescription').value.trim(),
+                deadline:    document.getElementById('goalDeadline').value,
+                status:      document.getElementById('goalStatus').value,
+                steps: []
+            });
+        }
+        saveGoals(goals);
+        closeGoalModal();
+        render();
+    }
+
+    function deleteGoal(id) {
+        if (!confirm('Delete this goal?')) return;
+        goals = goals.filter(x => x.id !== id);
+        saveGoals(goals);
+        render();
+    }
+
+    function openStepModal(goalId) {
+        stepGoalId = goalId;
+        document.getElementById('stepText').value = '';
+        renderExistingSteps();
+        document.getElementById('stepModal').classList.add('active');
+    }
+
+    function closeStepModal() {
+        document.getElementById('stepModal').classList.remove('active');
+        render();
+    }
+
+    function renderExistingSteps() {
+        const g = goals.find(x => x.id === stepGoalId);
+        const container = document.getElementById('existingSteps');
+        if (!g || g.steps.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = '<h4>Current steps:</h4>' +
+            g.steps.map(s => `
+                <span class="step-tag" style="${s.done ? 'opacity:0.55;text-decoration:line-through' : ''}">
+                    ${s.text}
+                    <button onclick="removeStep(${s.id})">×</button>
+                </span>`).join('');
+    }
+
+    function addStep() {
+        const text = document.getElementById('stepText').value.trim();
+        if (!text) { alert('Please enter a step.'); return; }
+        const g = goals.find(x => x.id === stepGoalId);
+        g.steps.push({ id: Date.now(), text, done: false });
+        saveGoals(goals);
+        document.getElementById('stepText').value = '';
+        renderExistingSteps();
+    }
+
+    function removeStep(stepId) {
+        const g = goals.find(x => x.id === stepGoalId);
+        g.steps = g.steps.filter(s => s.id !== stepId);
+        saveGoals(goals);
+        renderExistingSteps();
+    }
+
+    function toggleStep(goalId, stepId) {
+        const g = goals.find(x => x.id === goalId);
+        const s = g.steps.find(x => x.id === stepId);
+        s.done = !s.done;
+        if (g.steps.length > 0 && g.steps.every(x => x.done)) g.status = 'completed';
+        else if (g.status === 'completed') g.status = 'in-progress';
+        saveGoals(goals);
+        render();
+    }
+
+    document.getElementById('goalModal').addEventListener('click', e => { if (e.target === document.getElementById('goalModal')) closeGoalModal(); });
+    document.getElementById('stepModal').addEventListener('click', e => { if (e.target === document.getElementById('stepModal')) closeStepModal(); });
+
+    render();
+</script>
+</body>
+</html>
