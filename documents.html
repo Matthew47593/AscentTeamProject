@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Documents</title>
-
+<title>Ascent - Dashboard</title>
 <style>
     * {
         margin: 0;
@@ -30,14 +29,30 @@
 
     h2 {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 5px;
         color: #1e3c72;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 30px;
     }
 
     .top-bar {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 20px;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .top-bar-left {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -48,136 +63,531 @@
         font-weight: 600;
         text-decoration: none;
         font-size: 14px;
+        transition: 0.2s;
+        display: inline-block;
     }
 
-    .upload-btn {
-        background-color: #2a5298;
-        color: white;
+    .btn-primary { background-color: #2a5298; color: white; }
+    .btn-primary:hover { background-color: #1e3c72; }
+    .btn-secondary { background-color: #e0e0e0; color: #333; }
+    .btn-secondary:hover { background-color: #cfcfcf; }
+
+    .section { margin-bottom: 35px; }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e3c72;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #eef2f9;
     }
 
-    .upload-btn:hover {
-        background-color: #1e3c72;
+    /* Goals */
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
     }
 
-    .logout-btn {
-        background-color: #e0e0e0;
-        color: #333;
+    .goal-card {
+        background: #f7f9fc;
+        padding: 18px;
+        border-radius: 12px;
+        border-left: 5px solid #2a5298;
     }
 
-    .logout-btn:hover {
-        background-color: #cfcfcf;
+    .goal-card.completed { border-left-color: #27ae60; }
+    .goal-card.paused    { border-left-color: #e67e22; }
+
+    .goal-title { font-weight: 600; color: #1e3c72; margin-bottom: 5px; font-size: 15px; }
+    .goal-category { font-size: 12px; color: #2a5298; margin-bottom: 6px; }
+    .goal-description { font-size: 13px; color: #555; margin-bottom: 8px; }
+    .goal-meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+
+    .progress-bar-wrap {
+        background: #e0e7f0;
+        border-radius: 6px;
+        height: 7px;
+        margin-bottom: 5px;
+        overflow: hidden;
+    }
+    .progress-bar-fill { height: 100%; background: #2a5298; border-radius: 6px; }
+    .goal-card.completed .progress-bar-fill { background: #27ae60; }
+    .progress-label { font-size: 12px; color: #888; margin-bottom: 10px; }
+
+    .steps-list { list-style: none; margin-bottom: 12px; }
+
+    .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 5px 0;
+        font-size: 13px;
+        color: #444;
+        border-bottom: 1px solid #e8edf5;
+        cursor: pointer;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-item.done { color: #999; text-decoration: line-through; }
+
+    .step-checkbox {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #2a5298;
+        border-radius: 3px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        margin-top: 1px;
+    }
+    .step-checkbox.checked { background: #2a5298; }
+    .step-checkbox.checked::after { content: '✓'; color: white; font-size: 10px; font-weight: 700; }
+
+    .goal-actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+        padding: 6px 11px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
     }
 
+    /* Documents */
     .documents-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
+        gap: 15px;
     }
 
     .document-card {
         background: #f7f9fc;
-        padding: 20px;
+        padding: 18px;
         border-radius: 12px;
         border-left: 5px solid #2a5298;
-        transition: 0.3s;
+        transition: 0.2s;
     }
-
     .document-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
 
-    .document-title {
-        font-weight: 600;
-        color: #1e3c72;
-        margin-bottom: 8px;
+    .document-title { font-weight: 600; color: #1e3c72; margin-bottom: 5px; }
+    .document-category { font-size: 13px; color: #2a5298; margin-bottom: 5px; }
+    .document-description { font-size: 13px; color: #555; margin-bottom: 10px; }
+    .document-meta { font-size: 11px; color: #aaa; margin-bottom: 10px; }
+
+    .doc-actions { display: flex; gap: 8px; }
+
+    .empty-state { color: #aaa; font-size: 14px; padding: 10px 0; }
+
+    /* Modals */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
     }
 
-    .document-category {
-        font-size: 13px;
-        color: #2a5298;
-        margin-bottom: 8px;
+    .modal h3 { color: #1e3c72; margin-bottom: 20px; font-size: 17px; }
+
+    .input-group { margin-bottom: 16px; }
+    .input-group label { font-size: 13px; color: #2a5298; display: block; margin-bottom: 5px; font-weight: 600; }
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+        border-color: #2a5298;
+        box-shadow: 0 0 6px rgba(42,82,152,0.2);
     }
 
-    .document-description {
-        font-size: 13px;
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    .existing-steps { margin-bottom: 14px; }
+    .existing-steps h4 { font-size: 13px; color: #555; margin-bottom: 8px; }
+
+    .step-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eef2f9;
+        border-radius: 6px;
+        padding: 4px 9px;
+        font-size: 12px;
+        margin: 3px 3px 3px 0;
+        color: #333;
+    }
+    .step-tag button { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 14px; line-height: 1; padding: 0; }
+
+    .smart-hint {
+        background: #f0f4fb;
+        border-radius: 8px;
+        padding: 10px 13px;
+        font-size: 12px;
         color: #555;
+        margin-bottom: 16px;
+        line-height: 1.6;
     }
-
-    .empty-state {
-        text-align: center;
-        color: #777;
-        margin-top: 40px;
-    }
+    .smart-hint strong { color: #2a5298; }
 </style>
 </head>
-
 <body>
 
 <div class="container">
-    <h2>All Uploaded Documents</h2>
+    <h2>Dashboard</h2>
+    <p class="subtitle" id="welcomeMsg">Welcome back!</p>
 
     <div class="top-bar">
-        <a href="upload.html" class="btn upload-btn">+ Upload New</a>
-        <a href="login.html" class="btn logout-btn">Logout</a>
+        <div class="top-bar-left">
+            <button class="btn btn-primary" onclick="openGoalModal()">+ Add Goal</button>
+            <a href="upload.html" class="btn btn-primary">+ Upload Document</a>
+        </div>
+        <a href="login.html" class="btn btn-secondary" onclick="logout()">Logout</a>
     </div>
 
-    <div class="documents-grid" id="documentsGrid">
-        <!-- Documents will appear here -->
+    <div class="section">
+        <div class="section-title">Career Goals</div>
+        <div class="goals-grid" id="goalsGrid">
+            <p class="empty-state">No goals added yet.</p>
+        </div>
     </div>
 
-    <div class="empty-state" id="emptyState">
-        No documents uploaded yet.
+    <div class="section">
+        <div class="section-title">Uploaded Documents</div>
+        <div class="documents-grid" id="documentsGrid">
+            <p class="empty-state">No documents uploaded yet.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="modal-overlay" id="goalModal">
+    <div class="modal">
+        <h3 id="goalModalTitle">Add New Goal</h3>
+        <div class="input-group">
+            <label>Goal Title *</label>
+            <input type="text" id="goalTitle" placeholder="e.g. Become a Software Developer">
+        </div>
+        <div class="input-group">
+            <label>Category</label>
+            <select id="goalCategory">
+                <option value="">Select Category</option>
+                <option>Career Development</option>
+                <option>Education</option>
+                <option>Skills</option>
+                <option>Networking</option>
+                <option>Personal Branding</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Description</label>
+            <textarea id="goalDescription" rows="3" placeholder="What does achieving this goal look like?"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Target Deadline</label>
+            <input type="date" id="goalDeadline">
+        </div>
+        <div class="input-group">
+            <label>Status</label>
+            <select id="goalStatus">
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="paused">Paused</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveGoal()">Save Goal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Steps Modal -->
+<div class="modal-overlay" id="stepModal">
+    <div class="modal">
+        <h3>Manage Steps</h3>
+        <div class="smart-hint">
+            <strong>Tip:</strong> Try writing <strong>SMART</strong> steps — Specific, Measurable, Achievable, Relevant, Time-bound.<br>
+            e.g. <em>"Complete an online JavaScript course by May 30."</em>
+        </div>
+        <div class="existing-steps" id="existingSteps"></div>
+        <div class="input-group">
+            <label>New Step</label>
+            <input type="text" id="stepText" placeholder="e.g. Apply to 3 internships by March">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeStepModal()">Done</button>
+            <button class="btn btn-primary" onclick="addStep()">+ Add Step</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Example sample documents (replace with backend later)
-    const documents = [
-        {
-            title: "Math Assignment",
-            category: "Assignment",
-            description: "Chapter 5 algebra solutions."
-        },
-        {
-            title: "Job Resume",
-            category: "Resume",
-            description: "Updated resume for 2026 applications."
-        },
-        {
-            title: "Science Report",
-            category: "Report",
-            description: "Lab experiment results."
-        }
-    ];
-
-    const grid = document.getElementById("documentsGrid");
-    const emptyState = document.getElementById("emptyState");
-
-    function renderDocuments() {
-        if (documents.length === 0) {
-            emptyState.style.display = "block";
-            return;
-        }
-
-        emptyState.style.display = "none";
-
-        documents.forEach(doc => {
-            const card = document.createElement("div");
-            card.classList.add("document-card");
-
-            card.innerHTML = `
-                <div class="document-title">${doc.title}</div>
-                <div class="document-category">${doc.category}</div>
-                <div class="document-description">${doc.description}</div>
-            `;
-
-            grid.appendChild(card);
-        });
+    // ── Auth ─────────────────────────────────────────────────────────
+    if (localStorage.getItem('ascent_logged_in') !== 'true') {
+        window.location.href = 'login.html';
     }
 
-    renderDocuments();
-</script>
+    const currentUser = JSON.parse(localStorage.getItem('ascent_current_user') || '{}');
+    if (currentUser.name) {
+        document.getElementById('welcomeMsg').textContent = `Welcome back, ${currentUser.name}!`;
+    }
 
+    function logout() {
+        localStorage.removeItem('ascent_logged_in');
+        localStorage.removeItem('ascent_current_user');
+    }
+
+    // ── Goals ─────────────────────────────────────────────────────────
+    function loadGoals() { return JSON.parse(localStorage.getItem('ascent_goals') || '[]'); }
+    function saveGoals(g) { localStorage.setItem('ascent_goals', JSON.stringify(g)); }
+
+    let goals = loadGoals();
+    let editingId  = null;
+    let stepGoalId = null;
+
+    function renderGoals() {
+        const grid = document.getElementById('goalsGrid');
+        if (goals.length === 0) {
+            grid.innerHTML = '<p class="empty-state">No goals added yet.</p>';
+            return;
+        }
+        grid.innerHTML = goals.map(g => {
+            const total = g.steps.length;
+            const done  = g.steps.filter(s => s.done).length;
+            const pct   = total ? Math.round((done / total) * 100) : 0;
+            const statusLabel = { 'in-progress': 'In Progress', 'completed': 'Completed', 'paused': 'Paused' }[g.status] || g.status;
+
+            const stepsHtml = g.steps.length
+                ? `<ul class="steps-list">${g.steps.map(s => `
+                    <li class="step-item ${s.done ? 'done' : ''}" onclick="toggleStep(${g.id}, ${s.id})">
+                        <div class="step-checkbox ${s.done ? 'checked' : ''}"></div>
+                        <span>${s.text}</span>
+                    </li>`).join('')}</ul>`
+                : `<p style="font-size:13px;color:#bbb;margin-bottom:10px;">No steps added yet.</p>`;
+
+            return `
+                <div class="goal-card ${g.status === 'completed' ? 'completed' : g.status === 'paused' ? 'paused' : ''}">
+                    <div class="goal-title">${g.title}</div>
+                    ${g.category ? `<div class="goal-category">${g.category}</div>` : ''}
+                    ${g.description ? `<div class="goal-description">${g.description}</div>` : ''}
+                    <div class="goal-meta">${g.deadline ? `Deadline: ${formatDate(g.deadline)} &nbsp;·&nbsp; ` : ''}Status: ${statusLabel}</div>
+                    ${total > 0 ? `
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:${pct}%"></div>
+                        </div>
+                        <div class="progress-label">${done}/${total} steps complete</div>` : ''}
+                    ${stepsHtml}
+                    <div class="goal-actions">
+                        <button class="btn-sm" style="background:#2a5298;color:white" onclick="openStepModal(${g.id})">Steps</button>
+                        <button class="btn-sm" style="background:#e0e0e0;color:#333" onclick="openEditGoal(${g.id})">Edit</button>
+                        <button class="btn-sm" style="background:#fee2e2;color:#c0392b" onclick="deleteGoal(${g.id})">Delete</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    // ── Documents ─────────────────────────────────────────────────────
+    function renderDocs() {
+        const docs = JSON.parse(localStorage.getItem('ascent_documents') || '[]');
+        const grid = document.getElementById('documentsGrid');
+        if (docs.length === 0) {
+            grid.innerHTML = '<p class="empty-state">No documents uploaded yet.</p>';
+            return;
+        }
+        grid.innerHTML = docs.map((d, i) => {
+            const date = d.uploadedAt ? new Date(d.uploadedAt).toLocaleDateString('en-GB') : '';
+            const size = d.fileSize   ? formatSize(d.fileSize) : '';
+            return `
+                <div class="document-card">
+                    <div class="document-title">${d.title}</div>
+                    <div class="document-category">${d.category}</div>
+                    ${d.description ? `<div class="document-description">${d.description}</div>` : ''}
+                    <div class="document-meta">${d.fileName || ''} ${size ? '· ' + size : ''} ${date ? '· ' + date : ''}</div>
+                    <div class="doc-actions">
+                        ${d.fileData ? `<button class="btn-sm" style="background:#2a5298;color:white" onclick="downloadDoc(${i})">Download</button>` : ''}
+                        <button class="btn-sm" style="background:#fee2e2;color:#c0392b" onclick="deleteDoc(${i})">Delete</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function downloadDoc(index) {
+        const docs = JSON.parse(localStorage.getItem('ascent_documents') || '[]');
+        const doc  = docs[index];
+        if (!doc || !doc.fileData) return;
+        const a = document.createElement('a');
+        a.href     = doc.fileData;
+        a.download = doc.fileName || doc.title;
+        a.click();
+    }
+
+    function deleteDoc(index) {
+        if (!confirm('Delete this document?')) return;
+        const docs = JSON.parse(localStorage.getItem('ascent_documents') || '[]');
+        docs.splice(index, 1);
+        localStorage.setItem('ascent_documents', JSON.stringify(docs));
+        renderDocs();
+    }
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function formatDate(str) {
+        const [y, m, d] = str.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // ── Goal Modal ────────────────────────────────────────────────────
+    function openGoalModal() {
+        editingId = null;
+        document.getElementById('goalModalTitle').textContent = 'Add New Goal';
+        ['goalTitle','goalDescription','goalDeadline'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('goalCategory').value = '';
+        document.getElementById('goalStatus').value = 'in-progress';
+        document.getElementById('goalModal').classList.add('active');
+    }
+
+    function openEditGoal(id) {
+        const g = goals.find(x => x.id === id);
+        if (!g) return;
+        editingId = id;
+        document.getElementById('goalModalTitle').textContent = 'Edit Goal';
+        document.getElementById('goalTitle').value = g.title;
+        document.getElementById('goalCategory').value = g.category || '';
+        document.getElementById('goalDescription').value = g.description || '';
+        document.getElementById('goalDeadline').value = g.deadline || '';
+        document.getElementById('goalStatus').value = g.status;
+        document.getElementById('goalModal').classList.add('active');
+    }
+
+    function closeGoalModal() { document.getElementById('goalModal').classList.remove('active'); }
+
+    function saveGoal() {
+        const title = document.getElementById('goalTitle').value.trim();
+        if (!title) { alert('Please enter a goal title.'); return; }
+        if (editingId) {
+            const g = goals.find(x => x.id === editingId);
+            g.title       = title;
+            g.category    = document.getElementById('goalCategory').value;
+            g.description = document.getElementById('goalDescription').value.trim();
+            g.deadline    = document.getElementById('goalDeadline').value;
+            g.status      = document.getElementById('goalStatus').value;
+        } else {
+            goals.push({
+                id: Date.now(), title,
+                category:    document.getElementById('goalCategory').value,
+                description: document.getElementById('goalDescription').value.trim(),
+                deadline:    document.getElementById('goalDeadline').value,
+                status:      document.getElementById('goalStatus').value,
+                steps: []
+            });
+        }
+        saveGoals(goals);
+        closeGoalModal();
+        renderGoals();
+    }
+
+    function deleteGoal(id) {
+        if (!confirm('Delete this goal?')) return;
+        goals = goals.filter(x => x.id !== id);
+        saveGoals(goals);
+        renderGoals();
+    }
+
+    // ── Step Modal ────────────────────────────────────────────────────
+    function openStepModal(goalId) {
+        stepGoalId = goalId;
+        document.getElementById('stepText').value = '';
+        renderExistingSteps();
+        document.getElementById('stepModal').classList.add('active');
+    }
+
+    function closeStepModal() {
+        document.getElementById('stepModal').classList.remove('active');
+        renderGoals();
+    }
+
+    function renderExistingSteps() {
+        const g = goals.find(x => x.id === stepGoalId);
+        const container = document.getElementById('existingSteps');
+        if (!g || g.steps.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = '<h4>Current steps:</h4>' +
+            g.steps.map(s => `
+                <span class="step-tag" style="${s.done ? 'opacity:0.55;text-decoration:line-through' : ''}">
+                    ${s.text}
+                    <button onclick="removeStep(${s.id})">×</button>
+                </span>`).join('');
+    }
+
+    function addStep() {
+        const text = document.getElementById('stepText').value.trim();
+        if (!text) { alert('Please enter a step.'); return; }
+        const g = goals.find(x => x.id === stepGoalId);
+        g.steps.push({ id: Date.now(), text, done: false });
+        saveGoals(goals);
+        document.getElementById('stepText').value = '';
+        renderExistingSteps();
+    }
+
+    function removeStep(stepId) {
+        const g = goals.find(x => x.id === stepGoalId);
+        g.steps = g.steps.filter(s => s.id !== stepId);
+        saveGoals(goals);
+        renderExistingSteps();
+    }
+
+    function toggleStep(goalId, stepId) {
+        const g = goals.find(x => x.id === goalId);
+        const s = g.steps.find(x => x.id === stepId);
+        s.done = !s.done;
+        if (g.steps.length > 0 && g.steps.every(x => x.done)) g.status = 'completed';
+        else if (g.status === 'completed') g.status = 'in-progress';
+        saveGoals(goals);
+        renderGoals();
+    }
+
+    document.getElementById('goalModal').addEventListener('click', e => { if (e.target === document.getElementById('goalModal')) closeGoalModal(); });
+    document.getElementById('stepModal').addEventListener('click', e => { if (e.target === document.getElementById('stepModal')) closeStepModal(); });
+
+    renderGoals();
+    renderDocs();
+</script>
 </body>
 </html>
